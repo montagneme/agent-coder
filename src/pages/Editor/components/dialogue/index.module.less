@@ -1,0 +1,103 @@
+  .dialogue {
+    flex: 2;
+    min-height: 0;
+    height: 100%;
+    background-color: rgb(240, 253, 253);
+    display: flex;
+    flex-direction: column;
+
+    &-record {
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      overflow: auto;
+      .record {
+        &-user, &-ai{
+            width: 100%;
+            padding: 24px 10px;
+            display: flex;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+        &-text {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            .text {
+                display: inline-block;
+                background-color: #FFF;
+                padding: 16px;
+                box-sizing: border-box;
+                color: #404040;
+                font-weight: 500;
+                box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.12);
+            }
+        }
+        &-head {
+            width: 32px;
+            height: 32px;
+            background-color: #FFF;
+            border-radius: 100%;
+            box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.12);
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        &-user {
+            .record-text {
+                justify-content: flex-end;
+                .text {
+                    margin-right: 12px;
+                    border-radius: 8px 0 8px 8px;
+                }
+            }
+            .record-head {
+                background-color: rgb(185, 223, 255);
+            }
+        }
+        &-ai .text {
+            margin-left: 12px;
+            border-radius: 0 8px 8px 8px;
+        }
+      }
+      
+    }
+
+    &-input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+
+      & input {
+        border: 0;
+        height: 40px;
+        border-radius: 12px;
+        width: 100%;
+        padding: 0 12px;
+        outline: none;
+        box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.12);
+        padding-right: 70px;
+      }
+      &-send {
+        position: absolute;
+        height: 32px;
+        width: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: 12px;
+        top: 12px;
+        background-color: rgb(86, 127, 250);
+        border-radius: 9px;
+        color: #FFF;
+        font-size: 12px;
+        cursor: pointer;
+      }
+    }
+  }
