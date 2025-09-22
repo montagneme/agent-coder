@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route path="/editor" element={<Editor />} />
+      <Route path="/" element={<Editor />} />
       <Route path="/editor-preview" element={<EditorPreview />} />
       <Route path="/preview" element={<Preview />} />
     </Routes>
