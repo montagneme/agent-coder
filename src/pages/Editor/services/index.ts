@@ -26,3 +26,12 @@ export const save = (data: {
         data
     })
 }
+
+export const ai = (data: {
+    desc: string;
+    dialogueIndex: number;
+}) => {
+    return request(`http://localhost:3001/ai?desc=${data.desc}&dialogueIndex=${data.dialogueIndex}`, {
+        method: 'GET'
+    })
+}

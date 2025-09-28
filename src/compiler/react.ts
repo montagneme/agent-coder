@@ -23,6 +23,9 @@ const dangerousPatterns = [
 export const getTemplateCode = (componentId: string, code: string, css: string) => {
     return `
         const context = window.context || {};
+        const useState = React.useState;
+        const useEffect = React.useEffect;
+        const useContext = React.useContext;
 
         ${code}
 
@@ -30,15 +33,12 @@ export const getTemplateCode = (componentId: string, code: string, css: string) 
         const container = document.getElementById(CONTAINER_ID); // 组件壳子 dom
         
         if (container) {
-            let shadow = container.shadowRoot;
-            if (!shadow) {
-                shadow = container.attachShadow({ mode: 'open' }); // 创建 shadow 环境
-            }
-            ReactDOM.render(React.createElement(Main), shadow);
-            let style = shadow.querySelector('style');
+            ReactDOM.render(React.createElement(Main), container);
+            let style = document.querySelector('style[data-component-id="${componentId}"]');
             if (!style) {
                 style = document.createElement('style');
-                shadow.appendChild(style);
+                style.setAttribute('data-component-id', '${componentId}');
+                container.appendChild(style);
             }
             style.textContent = \`${css}\`;
         }
@@ -50,18 +50,12 @@ const compiler = (componentId: string, originCode: string, originCss: string) =>
     let hasError = false;
     let errorMessage: string[] = [];
     try {
-        const securityError = codeReview(originCode);
-        if (securityError.length) {
-            hasError = true;
-            errorMessage = securityError;
-        } else {
-            const babelRes = babel.transform(originCode, {
-                presets: ['react', 'typescript'],
-                filename: 'index.tsx',
-                plugins: [],
-            });
-            code = babelRes.code;
-        }
+        const babelRes = babel.transform(originCode, {
+            presets: ['react', 'typescript'],
+            filename: 'index.tsx',
+            plugins: [],
+        });
+        code = babelRes.code;
         
     } catch (e: any) {
         hasError = true;

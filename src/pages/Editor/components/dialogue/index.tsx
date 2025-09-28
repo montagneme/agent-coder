@@ -1,7 +1,7 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import styles from './index.module.less';
 import classNames from 'classnames/bind';
-import io, { Socket } from 'socket.io-client';
+import { ai } from '../../services';
 
 const cx = classNames.bind(styles);
 interface IProps {
@@ -17,52 +17,34 @@ type IRecord = {
     isLoading: boolean;
 }
 
+const eventSource = new EventSource('http://localhost:3001/sse');
 const Dialogue: FC<IProps> = ({ onGenerate }) => {
 
     const [record, setRecord] = useState<IRecord[]>([]);
     const [value, setValue] = useState('');
-    const ws = useRef<Socket | null>(null);
 
-    const handleListenAgentMessage = useCallback(({ dialogueIndex, message, code, css }: { dialogueIndex: number; message: string; code: string; css: string; }) => {
-        setRecord((record) => {
-            const newRecord = [...record];
-            const data = newRecord[dialogueIndex];
-            if (data.role === 'ai') {
-                data.content = message;
-                data.isLoading = false;
-                onGenerate?.({
-                    code,
-                    css
-                });
-            }
-            return newRecord;
-        });
+    useEffect(() => {
+        eventSource.onmessage = (event) => {
+            const { code, css, dialogueIndex, message } = JSON.parse(event?.data || '{}');
+            setRecord((record) => {
+                const newRecord = [...record];
+                const data = newRecord[dialogueIndex];
+                if (data.role === 'ai') {
+                    data.content = message;
+                    data.isLoading = false;
+                    onGenerate?.({
+                        code,
+                        css
+                    });
+                }
+                return newRecord;
+            });
+        };
     }, [onGenerate]);
-
-    useEffect(() => {
-        const socket = io('http://localhost:3001/chat');
-        ws.current = socket;
-        socket.on('connect', () => {
-            console.log('已连接到 WebSocket 服务');
-        });
-        return () => {
-            socket.close();
-        }
-    }, []);
-
-    useEffect(() => {
-        if (!ws.current) return;
-        ws.current.on('message', handleListenAgentMessage);
-        return () => {
-            if (!ws.current) return;
-            ws.current.off('message', handleListenAgentMessage);
-        }
-    }, [handleListenAgentMessage]);
 
     const generate = useCallback(async (desc: string, dialogueIndex: number) => {
         // 去生成代码
-        if (!ws.current) return;
-        ws.current.emit('message', { text: desc, dialogueIndex });
+        ai({ desc, dialogueIndex });
     }, [onGenerate]);
 
     const handleSend = useCallback(() => {
